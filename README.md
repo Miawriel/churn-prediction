@@ -15,9 +15,11 @@ Criterio de Éxito: El modelo fue el único en superar la métrica crítica del 
 
 Factores de Riesgo (Feature Importance): La Edad del cliente resultó ser el factor individual más determinante para el churn, seguido por el Balance y el Número de Productos.
 
-| **Métrica Crítica**   | **Regresión Logística** | **Random Forest** | **XGBoost (Ganador)** | 
-| **Recall (Clase 1)**  |         0.20            |       0.47        |        **0.55**       | 
-| **AUC Score**         |         0.77            |       0.87        |        **0.85**       |
+| **Métrica Crítica**             | **Regresión Logística**         | **Random Forest** | **XGBoost (Ganador)** | 
+
+| **Recall (Clase 1)**            |         0.20                    |       0.47        |        **0.55**       | 
+
+| **AUC Score**                   |         0.77                    |       0.87        |        **0.85**       |
 
 
 
@@ -51,6 +53,7 @@ requirements.txt: Dependencias de Python.
 Propuesta_Proyecto.pdf: Documento PDF de la propuesta inicial (LaTeX).
 
 Reporte_Final_Bancario.pdf: Reporte final detallado con conclusiones de negocio (LaTeX).
+
 
 
 
