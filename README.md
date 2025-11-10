@@ -30,7 +30,7 @@ Para replicar los resultados y generar los gráficos de Importancia de Caracter�
    cd proyecto-churn-bancario
 Instalar Dependencias: Asegúrate de tener Python instalado.
 
-Bash
+ ```bash
 
 pip install -r requirements.txt
 
@@ -40,9 +40,10 @@ Archivos de Datos: Coloca el archivo Churn_Modelling.csv en la carpeta raíz.
 
 Ejecutar el Script: El script completo generará el entrenamiento de 3 modelos y guardará los gráficos.
 
-Bash
+ ```bash
 
 python proyecto_churn_final.py
+
 
 
 
