@@ -24,8 +24,6 @@ Para replicar los resultados y generar los gráficos de Importancia de Caracter�
 
 Clonar el Repositorio:git clone [https://github.com/Miawriel/proyecto-churn-bancario](https://github.com/Miawriel/proyecto-churn-bancario)
 
-cd proyecto-churn-bancario
-
 Instalar Dependencias:
 
 Asegúrate de tener Python instalado.pip install -r requirements.txt
@@ -49,6 +47,7 @@ requirements.txt: Dependencias de Python.
 Propuesta_Proyecto.pdf: Documento PDF de la propuesta inicial (LaTeX).
 
 Reporte_Final_Bancario.pdf: Reporte final detallado con conclusiones de negocio (LaTeX).
+
 
 
 
