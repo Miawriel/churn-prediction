@@ -1,112 +1,116 @@
-# Carga de Datos
+# Data Loading
 import pandas as pd
+
 df = pd.read_csv('Churn_Modelling.csv')
 print(df.head())
 print(df.info())
 
-# Exploración de la variable objetivo
-print(df['Exited'].value_counts()) 
-# Esto te dirá cuántos clientes se fueron (1) vs. se quedaron (0).
-# Importar librerías necesarias
+# Target variable exploration
+print(df['Exited'].value_counts())
+# This shows how many customers churned (1) vs. stayed (0)
+
+# Import required libraries
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import pandas as pd
 
-# Suponiendo que tu DataFrame se llama 'df'
+# Assuming the DataFrame is called 'df'
 
-## 1. ELIMINAR COLUMNAS INNECESARIAS
-print("Paso 1: Eliminando identificadores...")
+# 1. DROP UNNECESSARY COLUMNS
+print("Step 1: Dropping identifier columns...")
 df = df.drop(['RowNumber', 'CustomerId', 'Surname'], axis=1)
 
-## 2. CODIFICACIÓN DE VARIABLES CATEGÓRICAS (One-Hot Encoding)
-# Las columnas 'Geography' y 'Gender' son de tipo 'object' (texto) y deben ser numéricas.
-# Usamos drop_first=True para evitar la trampa de variables dummy (multicolinealidad).
-print("Paso 2: Codificando variables categóricas...")
+# 2. ENCODE CATEGORICAL VARIABLES (One-Hot Encoding)
+# 'Geography' and 'Gender' are categorical variables and must be converted to numeric
+# drop_first=True is used to avoid multicollinearity (dummy variable trap)
+print("Step 2: Encoding categorical variables...")
 df = pd.get_dummies(df, columns=['Geography', 'Gender'], drop_first=True)
-print("Columnas después de codificación:", df.columns.tolist())
+print("Columns after encoding:", df.columns.tolist())
 print("-" * 30)
 
-
-## 3. SEPARACIÓN DE X (PREDICTORAS) e Y (OBJETIVO)
-# X son todas las columnas menos 'Exited'.
+# 3. SPLIT FEATURES (X) AND TARGET (y)
+# X contains all features except 'Exited'
 X = df.drop('Exited', axis=1)
-# y es la columna que queremos predecir.
+
+# y is the target variable
 y = df['Exited']
-print("Paso 3: Separando X e y. X ahora tiene", X.shape[1], "columnas.")
+print("Step 3: Splitting features and target. X has", X.shape[1], "features.")
 
+# 4. TRAIN-TEST SPLIT
+# Data is split before scaling to avoid data leakage
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+print("Step 4: Data split completed. Train:", X_train.shape, "Test:", X_test.shape)
 
-## 4. DIVISIÓN DE DATOS (Entrenamiento y Prueba)
-# Dividimos los datos antes de escalar para evitar 'Data Leakage'.
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-print("Paso 4: Datos divididos. Entrenar:", X_train.shape, "Prueba:", X_test.shape)
-
-
-## 5. ESCALADO DE VARIABLES NUMÉRICAS
-# Escalamos para que variables como 'EstimatedSalary' no dominen sobre 'NumOfProducts'.
+# 5. FEATURE SCALING
+# Scaling prevents features like 'EstimatedSalary' from dominating others
 scaler = StandardScaler()
 
-# 5a. Entrenamos el scaler solo con los datos de ENTRENAMIENTO
+# 5a. Fit scaler using training data only
 X_train_scaled = scaler.fit_transform(X_train)
 
-# 5b. Aplicamos esa misma transformación a los datos de PRUEBA
+# 5b. Apply the same transformation to test data
 X_test_scaled = scaler.transform(X_test)
-print("Paso 5: Variables numéricas escaladas.")
+print("Step 5: Feature scaling completed.")
 print("-" * 30)
 
-print("¡✅ PREPROCESAMIENTO COMPLETO!")
+print("✅ PREPROCESSING COMPLETED")
 
-#Entrenando el modelo Random Forest
+# Training the Random Forest model
 from sklearn.ensemble import RandomForestClassifier
 
-# 1. Instanciar (crear) el modelo
-# Usamos random_state para que los resultados sean reproducibles.
+# 6. MODEL TRAINING
+# random_state is used for reproducibility
 rf_model = RandomForestClassifier(random_state=42)
 
-# 2. Entrenar el modelo con los datos ESCALADOS de entrenamiento
-print("Paso 6: Entrenando el modelo Random Forest...")
+print("Step 6: Training Random Forest model...")
 rf_model.fit(X_train_scaled, y_train)
 
-print("✅ Modelo entrenado con éxito.")
+print("✅ Model training completed.")
 
-#Prediciendo con el modelo Random Forest
-# 3. Realizar predicciones sobre el conjunto de PRUEBA
+# Making predictions with Random Forest
+# 7. GENERATE PREDICTIONS ON TEST SET
 y_pred_rf = rf_model.predict(X_test_scaled)
-print("Predicciones generadas.")
+print("Predictions generated.")
 
-
-#Rendimiento
+# Model Evaluation
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
-print("\n--- Resultados de Evaluación ---")
+print("\n--- Model Evaluation Results ---")
 
-# a) Matriz de Confusión: Muestra los aciertos y errores
-print("\nMatriz de Confusión:")
+# a) Confusion Matrix
+print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred_rf))
-#   [ [Verdaderos Negativos (Correcto: Se queda)], [Falsos Positivos (Error: Dijo que se va, pero se queda)] ]
-#   [ [Falsos Negativos (Error: Dijo que se queda, pero se va)], [Verdaderos Positivos (Correcto: Se va)] ]
+# [[True Negatives, False Positives],
+#  [False Negatives, True Positives]]
 
-
-# b) Reporte de Clasificación (Accuracy, Precision, Recall, F1-Score)
-print("\nReporte de Clasificación:")
+# b) Classification Report (Accuracy, Precision, Recall, F1-score)
+print("\nClassification Report:")
 print(classification_report(y_test, y_pred_rf))
-# Fíjate especialmente en el 'Recall' para la clase '1' (Exited).
+# Pay special attention to Recall for class '1' (churned customers)
 
-# c) AUC (Area Under the Curve): Mide la capacidad de distinguir las clases
-auc_score = roc_auc_score(y_test, rf_model.predict_proba(X_test_scaled)[:, 1])
+# c) ROC-AUC Score
+auc_score = roc_auc_score(
+    y_test, rf_model.predict_proba(X_test_scaled)[:, 1]
+)
 print(f"\nAUC (Area Under the Curve): {auc_score:.4f}")
 
-#Factores de Riesgo
-# Obtener la importancia de las características del modelo Random Forest
-feature_importances = pd.Series(rf_model.feature_importances_, index=X.columns)
+# Risk Factors Analysis
+# Extract feature importance from Random Forest
+feature_importances = pd.Series(
+    rf_model.feature_importances_, index=X.columns
+)
 
-# Mostrar las 10 características más importantes
+# Display top 10 most important features
 top_10_features = feature_importances.nlargest(10)
-print("\n--- Top 10 Factores de Riesgo (Feature Importance) ---")
+print("\n--- Top 10 Risk Factors (Feature Importance) ---")
 print(top_10_features)
 
-# (Opcional: Visualiza los resultados)
+# Optional: Visualization
 import matplotlib.pyplot as plt
+
 plt.figure(figsize=(10, 6))
 top_10_features.plot(kind='barh')
-plt.title('Importancia de las Características en la Predicción de Churn')
+plt.title('Feature Importance for Churn Prediction')
 plt.show()
+
