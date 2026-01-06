@@ -1,5 +1,5 @@
 """
-Model evaluation for bank churn prediction project.
+Model evaluation and comparison for bank churn prediction project.
 """
 
 from sklearn.metrics import (
@@ -8,33 +8,38 @@ from sklearn.metrics import (
     roc_auc_score
 )
 
-from train import train_model
+from train import train_models
 
 
-def evaluate_model(csv_path):
+def evaluate_models(csv_path):
     """
-    Evaluates the trained model using classification metrics.
+    Evaluates multiple trained models and compares performance.
     """
 
-    model, X_test, y_test, feature_names = train_model(csv_path)
+    models, X_test, y_test, feature_names = train_models(csv_path)
 
-    y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    results = {}
 
-    print("\n--- Model Evaluation Results ---")
+    for name, model in models.items():
+        print(f"\n=== {name.upper()} RESULTS ===")
 
-    print("\nConfusion Matrix:")
-    print(confusion_matrix(y_test, y_pred))
+        y_pred = model.predict(X_test)
+        y_pred_proba = model.predict_proba(X_test)[:, 1]
 
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
+        print("\nConfusion Matrix:")
+        print(confusion_matrix(y_test, y_pred))
 
-    auc_score = roc_auc_score(y_test, y_pred_proba)
-    print(f"\nAUC (Area Under the Curve): {auc_score:.4f}")
+        print("\nClassification Report:")
+        print(classification_report(y_test, y_pred))
 
-    return model, feature_names
+        auc = roc_auc_score(y_test, y_pred_proba)
+        print(f"AUC: {auc:.4f}")
+
+        results[name] = auc
+
+    return results
 
 
 if __name__ == "__main__":
-    evaluate_model("Churn_Modelling.csv")
+    evaluate_models("Churn_Modelling.csv")
 
